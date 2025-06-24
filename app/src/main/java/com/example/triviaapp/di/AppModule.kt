@@ -15,6 +15,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Singleton
+    @Provides
+    fun provideQuestionRepository(api: QusetionApi) = QuestionRepository(api)
+
     @Singleton
     @Provides
     fun provideQuestionApi() : QusetionApi{
@@ -25,8 +30,5 @@ object AppModule {
             .create(QusetionApi::class.java)
     }
 
-    @Singleton
-    @Provides
-    fun provideQuestionRepository(api: QusetionApi) = QuestionRepository(api)
 
 }

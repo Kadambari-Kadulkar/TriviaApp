@@ -1,6 +1,7 @@
 package com.example.triviaapp.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,21 +41,7 @@ fun LoadQuestions(viewModel: QuestionsViewModel = hiltViewModel()){
 
 @Composable
 fun Questions(viewModel: QuestionsViewModel){
-    viewModel.
-    viewModel.getAllQuestions1().observe(this) { resultState ->
-        when (resultState) {
-            is NetworkResultState.Success -> {
-                // Handle successful API calls
-                resultState.data.toString()
-            }
-            is NetworkResultState.Loading -> {
-                // Handle UI when API calls is loading
-            }
-            is NetworkResultState.Error -> {
-                // Handle error API calls
-                // Example: Show error message to the user
-            }
-        }
-    }
+        val questions = viewModel.data.value.data?.results?.toMutableList() ?: emptyList()
+        Log.e("questions: ", if(questions.isNotEmpty()) questions.size.toString() else "No Questions")
 }
 
