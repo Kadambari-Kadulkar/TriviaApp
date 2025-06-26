@@ -14,7 +14,7 @@ class QuestionRepository @Inject constructor(val api: QusetionApi) {
      {
         try{
             dataOrException.loading = true
-            dataOrException.data = api.getAllQuestions("20","21","medium")
+            dataOrException.data = api.getAllQuestions("10","21","medium")
             if(dataOrException.data.toString().isNotEmpty()) dataOrException.loading = false
         }
         catch (ex: Exception){
