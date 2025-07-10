@@ -2,6 +2,7 @@ package com.example.triviaapp.component
 
 import android.graphics.Paint.Align
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.htmlEncode
 import com.example.triviaapp.model.Questions
 import com.example.triviaapp.model.Result
 import com.example.triviaapp.util.AppColors
@@ -73,7 +76,7 @@ fun Questions(viewModel: QuestionsViewModel){
     }
 }
 
-//@Preview
+
 @Composable
 fun QuestionsDisplay(
     questions: Result,
@@ -131,22 +134,22 @@ fun QuestionsDisplay(
             //Choices
             choiceState.forEachIndexed { index, answer ->
                 Row (Modifier
-                    .padding(3.dp)
+                    .padding(5.dp)
                     .fillMaxWidth()
-                    .height(45.dp)
+                    .height(55.dp)
                     .border(
-                        width = 4.dp,
+                        width = 2.dp,
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                AppColors.mOffDarkPurple,
-                                AppColors.mOffDarkPurple
+                                AppColors.mLightGray,
+                                AppColors.mLightGray
                             )
                         ),
                         shape = RoundedCornerShape(
-                            topStartPercent = 50,
-                            topEndPercent = 50,
-                            bottomEndPercent = 50,
-                            bottomStartPercent = 50
+                            topStartPercent = 30,
+                            topEndPercent = 30,
+                            bottomEndPercent = 30,
+                            bottomStartPercent = 30
                         )
                     )
                     .background(Color.Transparent),
@@ -178,10 +181,14 @@ fun QuestionsDisplay(
                 }
             }
             Button(onClick = { onNextClicked(questionIndex.value) } , modifier = Modifier
+                .width(130.dp)
                 .padding(3.dp)
-                .align(Alignment.CenterHorizontally),shape = RoundedCornerShape(34.dp),colors= ButtonDefaults.buttonColors(AppColors.mLightBlue)) {
-                Text(text = "Next", modifier = Modifier.padding(4.dp),color = AppColors.mOffWhite, fontSize = 17.sp)
-            }
+                .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(13.dp),
+                border = BorderStroke(2.dp,AppColors.mLightGray),
+                    colors= ButtonDefaults.buttonColors(AppColors.mOffWhite)) {
+                    Text(text = "Next", modifier = Modifier.padding(4.dp),color = AppColors.mBlack, fontSize = 17.sp)
+                }
 
         }
     }
