@@ -48,7 +48,7 @@ import com.example.triviaapp.view.QuestionsViewModel
 
 @Composable
 fun Questions(viewModel: QuestionsViewModel){
-    val questions = viewModel.data.value.data//.results?.toMutableList() ?: emptyList()
+    val questions = viewModel.data.value.data?.results?.toMutableList() ?: emptyList()
     //Log.e("questions: ", if(questions.isNotEmpty()) questions.toString() else "No Questions")
     val questionIndex = remember {
         mutableStateOf(0)
@@ -58,13 +58,16 @@ fun Questions(viewModel: QuestionsViewModel){
     }else{
         val question =
             try {
-                questions?.results?.get(questionIndex.value)
-        }catch (ex: Exception){
-            ex.localizedMessage?.let { Log.e("questions: ", it) }
-        }
-        if (questions != null){
-            QuestionsDisplay(questions,questionIndex,viewModel){
-                questionIndex.value += 1
+                questions[questionIndex.value]
+            } catch (ex: Exception) {
+                null
+                //questions.first()
+            }
+        if (questions.isNotEmpty()) {
+            if (question != null) {
+                QuestionsDisplay(questions = question, questionIndex, viewModel) {
+                    questionIndex.value += 1
+                }
             }
         }
     }
@@ -73,13 +76,14 @@ fun Questions(viewModel: QuestionsViewModel){
 //@Preview
 @Composable
 fun QuestionsDisplay(
-    questions: Questions,
+    questions: Result,
     questionIndex: MutableState<Int>,
     viewModel: QuestionsViewModel,
     onNextClicked: (Int) -> Unit = {}
 ){
-    val answersList = questions.results[questionIndex.value].incorrect_answers.toMutableList()
-    answersList.add(questions.results[questionIndex.value].correct_answer)
+    Log.e("questionIndex",questionIndex.value.toString())
+    val answersList = questions.incorrect_answers.toMutableList()
+    answersList.add(questions.correct_answer)
     val choiceState = remember (questions){
         answersList
         //questions.incorrect_answers.toMutableList().add(questions.correct_answer)
@@ -95,7 +99,7 @@ fun QuestionsDisplay(
     val updateAnswer : (String) -> Unit = remember (questions){
         {
             answerState.value = it
-            correctAnswerState.value = it == questions.results[questionIndex.value].correct_answer
+            correctAnswerState.value = it == questions.correct_answer
         }
     }
     val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f,10f),0f)
@@ -111,11 +115,14 @@ fun QuestionsDisplay(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            QuestionTracker(counter = questionIndex.value, questions.results.size)
+            QuestionTracker(counter = questionIndex.value, 10)
             DrawSeparator(pathEffect)
 
-            Column { Text(text= questions.results[questionIndex.value].question,
-                modifier = Modifier.padding(16.dp,16.dp,6.dp,6.dp).align(Alignment.Start).fillMaxHeight(0.3f),
+            Column { Text(text= questions.question,
+                modifier = Modifier
+                    .padding(16.dp, 16.dp, 6.dp, 6.dp)
+                    .align(Alignment.Start)
+                    .fillMaxHeight(0.3f),
                 fontSize = 20.sp,
                 color = AppColors.mBlack,
                 fontWeight = FontWeight.Bold,
@@ -127,9 +134,21 @@ fun QuestionsDisplay(
                     .padding(3.dp)
                     .fillMaxWidth()
                     .height(45.dp)
-                    .border(width = 4.dp,
-                        brush = Brush.linearGradient(colors = listOf(AppColors.mOffDarkPurple,AppColors.mOffDarkPurple)),
-                        shape = RoundedCornerShape(topStartPercent = 50, topEndPercent = 50, bottomEndPercent = 50, bottomStartPercent = 50))
+                    .border(
+                        width = 4.dp,
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                AppColors.mOffDarkPurple,
+                                AppColors.mOffDarkPurple
+                            )
+                        ),
+                        shape = RoundedCornerShape(
+                            topStartPercent = 50,
+                            topEndPercent = 50,
+                            bottomEndPercent = 50,
+                            bottomStartPercent = 50
+                        )
+                    )
                     .background(Color.Transparent),
                     verticalAlignment = Alignment.CenterVertically){
                         RadioButton(selected = (answerState.value == answer),
@@ -158,7 +177,9 @@ fun QuestionsDisplay(
 
                 }
             }
-            Button(onClick = { onNextClicked(questionIndex.value) } , modifier = Modifier.padding(3.dp).align(Alignment.CenterHorizontally),shape = RoundedCornerShape(34.dp),colors= ButtonDefaults.buttonColors(AppColors.mLightBlue)) {
+            Button(onClick = { onNextClicked(questionIndex.value) } , modifier = Modifier
+                .padding(3.dp)
+                .align(Alignment.CenterHorizontally),shape = RoundedCornerShape(34.dp),colors= ButtonDefaults.buttonColors(AppColors.mLightBlue)) {
                 Text(text = "Next", modifier = Modifier.padding(4.dp),color = AppColors.mOffWhite, fontSize = 17.sp)
             }
 
@@ -183,7 +204,9 @@ fun QuestionTracker(counter:Int = 10,
 
 @Composable
 fun DrawSeparator(pathEffect : PathEffect){
-    Canvas(modifier = Modifier.fillMaxWidth().height(1.dp)) {
+    Canvas(modifier = Modifier
+        .fillMaxWidth()
+        .height(1.dp)) {
         drawLine(color = AppColors.mBlack, start = Offset(0f,0f), end = Offset(size.width,0f), pathEffect = pathEffect)
     }
 }
