@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -20,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,13 +48,24 @@ import com.example.triviaapp.view.QuestionsViewModel
 
 @Composable
 fun Questions(viewModel: QuestionsViewModel){
-    val questions = viewModel.data.value.data?.results?.toMutableList() ?: emptyList()
+    val questions = viewModel.data.value.data//.results?.toMutableList() ?: emptyList()
     //Log.e("questions: ", if(questions.isNotEmpty()) questions.toString() else "No Questions")
+    val questionIndex = remember {
+        mutableStateOf(0)
+    }
     if(viewModel.data.value.loading == true){
         CircularProgressIndicator()
     }else{
-        if (questions.isNotEmpty()){
-            QuestionsDisplay(questions.first())
+        val question =
+            try {
+                questions?.results?.get(questionIndex.value)
+        }catch (ex: Exception){
+            ex.localizedMessage?.let { Log.e("questions: ", it) }
+        }
+        if (questions != null){
+            QuestionsDisplay(questions,questionIndex,viewModel){
+                questionIndex.value += 1
+            }
         }
     }
 }
@@ -58,13 +73,13 @@ fun Questions(viewModel: QuestionsViewModel){
 //@Preview
 @Composable
 fun QuestionsDisplay(
-    questions: Result,
-    //questionIndex: MutableState<Int>,
-    //viewModel: QuestionsViewModel,
+    questions: Questions,
+    questionIndex: MutableState<Int>,
+    viewModel: QuestionsViewModel,
     onNextClicked: (Int) -> Unit = {}
 ){
-    val answersList = questions.incorrect_answers.toMutableList()
-    answersList.add(questions.correct_answer)
+    val answersList = questions.results[questionIndex.value].incorrect_answers.toMutableList()
+    answersList.add(questions.results[questionIndex.value].correct_answer)
     val choiceState = remember (questions){
         answersList
         //questions.incorrect_answers.toMutableList().add(questions.correct_answer)
@@ -80,7 +95,7 @@ fun QuestionsDisplay(
     val updateAnswer : (String) -> Unit = remember (questions){
         {
             answerState.value = it
-            correctAnswerState.value = it == questions.correct_answer
+            correctAnswerState.value = it == questions.results[questionIndex.value].correct_answer
         }
     }
     val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f,10f),0f)
@@ -96,10 +111,10 @@ fun QuestionsDisplay(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            QuestionTracker()
+            QuestionTracker(counter = questionIndex.value, questions.results.size)
             DrawSeparator(pathEffect)
 
-            Column { Text(text= questions.question,
+            Column { Text(text= questions.results[questionIndex.value].question,
                 modifier = Modifier.padding(16.dp,16.dp,6.dp,6.dp).align(Alignment.Start).fillMaxHeight(0.3f),
                 fontSize = 20.sp,
                 color = AppColors.mBlack,
@@ -127,10 +142,24 @@ fun QuestionsDisplay(
                             }else{
                                 Color.Red.copy(alpha = 0.5f)
                             }))
-
-                    Text(text = answer)
+                    val annotatedString = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Light,
+                            color = if(correctAnswerState.value == true && answerState.value == answer){
+                            Color.Green//.copy(alpha = 0.5f)
+                        }else if(correctAnswerState.value == false && answerState.value == answer){
+                            Color.Red//.copy(alpha = 0.5f)
+                        }else{
+                            AppColors.mBlack
+                        }, fontSize = 17.sp)){
+                            append(answer)
+                        }
+                    }
+                    Text(annotatedString, Modifier.padding(6.dp))
 
                 }
+            }
+            Button(onClick = { onNextClicked(questionIndex.value) } , modifier = Modifier.padding(3.dp).align(Alignment.CenterHorizontally),shape = RoundedCornerShape(34.dp),colors= ButtonDefaults.buttonColors(AppColors.mLightBlue)) {
+                Text(text = "Next", modifier = Modifier.padding(4.dp),color = AppColors.mOffWhite, fontSize = 17.sp)
             }
 
         }
