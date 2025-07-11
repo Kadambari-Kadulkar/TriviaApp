@@ -12,7 +12,7 @@ interface QusetionApi {
 //    @GET("/my/api/call")
 //    suspend fun getSearchProduct(@Query("p1") p1: String , @Query("p2") p2: String )
     @GET("/api.php?")
-    suspend fun getAllQuestions(@Query("amount") amount: String = "20",
-                                @Query("category") category: String = "21",
-                                @Query("difficulty") difficulty: String = "medium") : Questions
+    suspend fun getAllQuestions(@Query("amount") amount: String ,
+                                @Query("category") category: String ,
+                                @Query("difficulty") difficulty: String ) : Questions
 }

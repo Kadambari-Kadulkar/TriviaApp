@@ -36,6 +36,10 @@ class QuestionsViewModel @Inject constructor(private val repo: QuestionRepositor
 
     }
 
+    fun getTotalQuestionsCount():Int{
+        return data.value.data?.results?.toMutableList()?.size!!
+    }
+
 //    fun getAllQuestions1() = liveData(Dispatchers.IO) {it
 //            emit(NetworkResultState.Loading)
 //        try{

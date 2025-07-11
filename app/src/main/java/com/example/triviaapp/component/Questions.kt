@@ -1,6 +1,5 @@
 package com.example.triviaapp.component
 
-import android.graphics.Paint.Align
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -8,16 +7,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -25,11 +26,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -38,13 +40,12 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.htmlEncode
-import com.example.triviaapp.model.Questions
 import com.example.triviaapp.model.Result
 import com.example.triviaapp.util.AppColors
 import com.example.triviaapp.view.QuestionsViewModel
@@ -118,7 +119,8 @@ fun QuestionsDisplay(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            QuestionTracker(counter = questionIndex.value, 10)
+            QuestionTracker(counter = questionIndex.value, viewModel.getTotalQuestionsCount())
+            if(questionIndex.value >=3) ShowProgress(score = questionIndex.value, viewModel.getTotalQuestionsCount())
             DrawSeparator(pathEffect)
 
             Column { Text(text= questions.question,
@@ -211,9 +213,51 @@ fun QuestionTracker(counter:Int = 10,
 
 @Composable
 fun DrawSeparator(pathEffect : PathEffect){
-    Canvas(modifier = Modifier
+    Canvas(modifier = Modifier.paddingFromBaseline(18.dp,0.dp)
         .fillMaxWidth()
         .height(1.dp)) {
         drawLine(color = AppColors.mBlack, start = Offset(0f,0f), end = Offset(size.width,0f), pathEffect = pathEffect)
+    }
+}
+
+@Composable
+fun ShowProgress(score: Int = 3, totalQuestionsCount: Int){
+    val gradient = Brush.linearGradient(listOf(AppColors.mBlack,AppColors.mBlack))
+    val progressFactor by remember(score) {
+        mutableStateOf(score / totalQuestionsCount.toFloat())
+    }
+    Row (modifier = Modifier
+        .padding(3.dp)
+        .fillMaxWidth()
+        .height(40.dp)
+        .border(width= 1.dp, brush = Brush.linearGradient(colors = listOf(AppColors.mLightGray,AppColors.mLightGray)),
+            shape = RoundedCornerShape(30.dp))
+        .clip(RoundedCornerShape(topStartPercent = 50,
+                                 topEndPercent = 50,
+                                 bottomStartPercent = 50,
+                                 bottomEndPercent = 50))
+        .background(Color.Transparent),
+        verticalAlignment = Alignment.CenterVertically){
+            Button(
+                contentPadding = PaddingValues(1.dp),
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth(progressFactor)
+                    .background(brush = gradient),
+                enabled = false,
+                elevation = null,
+                colors = buttonColors(Color.Transparent, Color.Transparent)
+
+            ) {
+                Text( text = (score * 10).toString(),
+                    modifier = Modifier
+                    //.clip(RoundedCornerShape(8.dp))
+                    .fillMaxHeight(0.75f)
+                    .fillMaxWidth()
+                    .padding(4.dp)
+                    .align(Alignment.CenterVertically),
+                    color = AppColors.mOffWhite,
+                    textAlign = TextAlign.Center)
+            }
     }
 }
