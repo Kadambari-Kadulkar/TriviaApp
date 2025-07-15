@@ -1,6 +1,7 @@
 package com.example.triviaapp.component
 
 import android.util.Log
+import android.widget.TextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -43,11 +44,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import com.example.triviaapp.model.Result
 import com.example.triviaapp.util.AppColors
+import com.example.triviaapp.util.Util
 import com.example.triviaapp.view.QuestionsViewModel
 
 @Composable
@@ -55,7 +58,7 @@ fun Questions(viewModel: QuestionsViewModel){
     val questions = viewModel.data.value.data?.results?.toMutableList() ?: emptyList()
     //Log.e("questions: ", if(questions.isNotEmpty()) questions.toString() else "No Questions")
     val questionIndex = remember {
-        mutableStateOf(0)
+        mutableStateOf(1)
     }
     if(viewModel.data.value.loading == true){
         CircularProgressIndicator()
@@ -85,7 +88,6 @@ fun QuestionsDisplay(
     viewModel: QuestionsViewModel,
     onNextClicked: (Int) -> Unit = {}
 ){
-    Log.e("questionIndex",questionIndex.value.toString())
     val answersList = questions.incorrect_answers.toMutableList()
     answersList.add(questions.correct_answer)
     val choiceState = remember (questions){
@@ -123,7 +125,8 @@ fun QuestionsDisplay(
             if(questionIndex.value >=3) ShowProgress(score = questionIndex.value, viewModel.getTotalQuestionsCount())
             DrawSeparator(pathEffect)
 
-            Column { Text(text= questions.question,
+            Column {
+                Text(text = Util.decodeHTMLText(questions.question),
                 modifier = Modifier
                     .padding(16.dp, 16.dp, 6.dp, 6.dp)
                     .align(Alignment.Start)
@@ -162,20 +165,20 @@ fun QuestionsDisplay(
                             colors = RadioButtonDefaults.colors(
                                 selectedColor =
                                     if(correctAnswerState.value == true && answerState.value == answer){
-                                    Color.Green.copy(alpha = 0.5f)
+                                        AppColors.mGreen
                             }else{
                                 Color.Red.copy(alpha = 0.5f)
                             }))
                     val annotatedString = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Light,
                             color = if(correctAnswerState.value == true && answerState.value == answer){
-                            Color.Green//.copy(alpha = 0.5f)
+                                AppColors.mGreen
                         }else if(correctAnswerState.value == false && answerState.value == answer){
                             Color.Red//.copy(alpha = 0.5f)
                         }else{
                             AppColors.mBlack
                         }, fontSize = 17.sp)){
-                            append(answer)
+                            append(Util.decodeHTMLText(answer))
                         }
                     }
                     Text(annotatedString, Modifier.padding(6.dp))
@@ -188,7 +191,7 @@ fun QuestionsDisplay(
                 .align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(13.dp),
                 border = BorderStroke(2.dp,AppColors.mLightGray),
-                    colors= ButtonDefaults.buttonColors(AppColors.mOffWhite)) {
+                    colors= buttonColors(AppColors.mOffWhite)) {
                     Text(text = "Next", modifier = Modifier.padding(4.dp),color = AppColors.mBlack, fontSize = 17.sp)
                 }
 
@@ -207,7 +210,7 @@ fun QuestionTracker(counter:Int = 10,
              }
          }
     } },
-        modifier =  Modifier.padding(20.dp))
+        modifier =  Modifier.padding(13.dp))
     
 }
 
@@ -230,12 +233,24 @@ fun ShowProgress(score: Int = 3, totalQuestionsCount: Int){
         .padding(3.dp)
         .fillMaxWidth()
         .height(40.dp)
-        .border(width= 1.dp, brush = Brush.linearGradient(colors = listOf(AppColors.mLightGray,AppColors.mLightGray)),
-            shape = RoundedCornerShape(30.dp))
-        .clip(RoundedCornerShape(topStartPercent = 50,
-                                 topEndPercent = 50,
-                                 bottomStartPercent = 50,
-                                 bottomEndPercent = 50))
+        .border(
+            width = 1.dp,
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    AppColors.mLightGray,
+                    AppColors.mLightGray
+                )
+            ),
+            shape = RoundedCornerShape(30.dp)
+        )
+        .clip(
+            RoundedCornerShape(
+                topStartPercent = 50,
+                topEndPercent = 50,
+                bottomStartPercent = 50,
+                bottomEndPercent = 50
+            )
+        )
         .background(Color.Transparent),
         verticalAlignment = Alignment.CenterVertically){
             Button(
