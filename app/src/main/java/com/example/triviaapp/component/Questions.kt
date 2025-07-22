@@ -1,16 +1,17 @@
 package com.example.triviaapp.component
 
-import android.util.Log
-import android.widget.TextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,18 +19,20 @@ import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,12 +49,13 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.HtmlCompat
+import com.example.triviaapp.model.ConfettiParticle
 import com.example.triviaapp.model.Result
 import com.example.triviaapp.util.AppColors
 import com.example.triviaapp.util.Util
 import com.example.triviaapp.view.QuestionsViewModel
+import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 @Composable
 fun Questions(viewModel: QuestionsViewModel){
@@ -60,22 +64,43 @@ fun Questions(viewModel: QuestionsViewModel){
     val questionIndex = remember {
         mutableStateOf(1)
     }
+    val showCompletion = remember { mutableStateOf(false) }
     if(viewModel.data.value.loading == true){
         CircularProgressIndicator()
     }else{
-        val question =
-            try {
-                questions[questionIndex.value]
-            } catch (ex: Exception) {
-                null
-                //questions.first()
-            }
+//        val question =
+//            try {
+//                questions[questionIndex.value]
+//            } catch (ex: Exception) {
+//                null
+//                //questions.first()
+//            }
         if (questions.isNotEmpty()) {
-            if (question != null) {
-                QuestionsDisplay(questions = question, questionIndex, viewModel) {
-                    questionIndex.value += 1
+            if(showCompletion.value){
+                QuizCompletionScreen(onRestart =  {
+                    questionIndex.value = 0
+                    showCompletion.value = false
+                    //viewModel.refreshData()
+                })
+            }else{
+                val question = questions.getOrNull(questionIndex.value)
+                question.let {
+                    if (question != null) {
+                        QuestionsDisplay(questions = question, questionIndex,viewModel){
+                            if(questionIndex.value < questions.size - 1){
+                                questionIndex.value+=1
+                            }else{
+                                showCompletion.value = true
+                            }
+                        }
+                    }
                 }
             }
+//            if (question != null) {
+//                QuestionsDisplay(questions = question, questionIndex, viewModel) {
+//                    questionIndex.value += 1
+//                }
+//            }
         }
     }
 }
@@ -275,4 +300,65 @@ fun ShowProgress(score: Int = 3, totalQuestionsCount: Int){
                     textAlign = TextAlign.Center)
             }
     }
+}
+
+@Composable
+fun QuizCompletionScreen(onRestart:() -> Unit){
+    Box (modifier = Modifier.fillMaxSize()){
+        ConfettiAnimation(modifier = Modifier.fillMaxSize())
+
+        Column (modifier = Modifier
+            .align(Alignment.Center)
+            .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally){
+            Text(text = "🎉 Quiz Completed! \uD83C\uDF89",
+                style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRestart){
+                Text("Restart Quiz")
+            }
+
+        }
+    }
+
+}
+
+@Composable
+fun ConfettiAnimation(modifier: Modifier = Modifier, onAnimationEnd: () -> Unit = {}) {
+    var particles by remember { mutableStateOf(emptyList<ConfettiParticle>()) }
+
+    LaunchedEffect(Unit)
+    {
+        particles = List(100) {
+            ConfettiParticle(
+                x = Random.nextFloat() * 1200f,
+                y = Random.nextFloat() * -1200f,
+                velocityY = Random.nextFloat() * 28f + 28f,
+                color = Color(
+                    red = Random.nextFloat(),
+                    green = Random.nextFloat(),
+                    blue = Random.nextFloat(),
+                    alpha = 1f
+                ),
+                size = Random.nextFloat() * 12f + 4f
+            )
+        }
+        repeat(100) {
+            delay(16)
+            particles = particles.map { it.copy(y = it.y + it.velocityY) }
+        }
+        //onAnimationEnd()
+    }
+
+    Canvas(modifier = modifier.fillMaxSize())
+    {
+        particles.forEach {
+            drawCircle(
+                color = it.color,
+                radius = it.size,
+                center = Offset(it.x, it.y)
+            )
+        }
+    }
+
 }
