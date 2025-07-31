@@ -6,6 +6,6 @@ import com.example.triviaapp.component.Questions
 
 @Composable
 fun TriviaHome(viewModel: QuestionsViewModel = hiltViewModel()){
-    Questions(viewModel)
+    //Questions(viewModel)
 
 }

@@ -49,6 +49,8 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.triviaapp.model.ConfettiParticle
 import com.example.triviaapp.model.Result
 import com.example.triviaapp.util.AppColors
@@ -58,7 +60,7 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 @Composable
-fun Questions(viewModel: QuestionsViewModel){
+fun Questions(navController:NavController,categoryId: Int, difficulty: String, viewModel: QuestionsViewModel= hiltViewModel()){
     val questions = viewModel.data.value.data?.results?.toMutableList() ?: emptyList()
     //Log.e("questions: ", if(questions.isNotEmpty()) questions.toString() else "No Questions")
     val questionIndex = remember {
