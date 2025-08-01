@@ -38,7 +38,7 @@ fun QuizNavGraph(
         }
         //Result Screen
         composable(
-            route = "result_screen/{score}/{total}", arguments = listOf(
+            route = "quiz_completion/{score}/{total}", arguments = listOf(
                 navArgument("score") { type = NavType.IntType },
                 navArgument("total") { type = NavType.IntType })
         ) { navBackStackEntry ->

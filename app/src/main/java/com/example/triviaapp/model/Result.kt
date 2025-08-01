@@ -6,5 +6,6 @@ data class Result(
     val difficulty: String,
     val incorrect_answers: List<String>,
     val question: String,
-    val type: String
+    val type: String,
+    var answers: List<String>
 )
