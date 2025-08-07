@@ -1,7 +1,13 @@
 package com.example.triviaapp.component
 
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +20,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -34,6 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,12 +87,53 @@ fun Questions(navController:NavController,
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        "Question ${currentQuestionIndex + 1} of ${viewModel.getTotalQuestionsCount()}",
-                        fontSize = 16.sp
-                    )
-                    Text("Score = $score", fontSize = 16.sp)
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+
+                    Column(verticalArrangement = Arrangement.Center) {
+                        Text(
+                            "Question ${currentQuestionIndex + 1} of ${viewModel.getTotalQuestionsCount()}",
+                            fontSize = 20.sp
+                        )
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Score",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = AppColors.mBlack
+                        )
+
+                        AnimatedContent(
+                            targetState = score,
+                            transitionSpec = {
+                                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(
+                                    animationSpec = tween(300)
+                                )
+                            },
+                            label = "ScoreAnimation"
+                        ) { animatedScore ->
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(Color.Transparent, shape = CircleShape)
+                                    .border(1.dp, color = AppColors.mBlack, shape = CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "$animatedScore",
+                                    color = AppColors.mBlack,
+                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
