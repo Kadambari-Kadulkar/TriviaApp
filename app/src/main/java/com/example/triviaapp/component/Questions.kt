@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -220,8 +219,8 @@ fun Questions(navController:NavController,
                 Button(
                     onClick = {
                         if (currentQuestionIndex + 1 == viewModel.getTotalQuestionsCount()) {
-                            val totaQuestions = viewModel.getTotalQuestionsCount()
-                            navController.navigate("quiz_completion/${score}/${totaQuestions}") {
+                            val totalQuestions = viewModel.getTotalQuestionsCount()
+                            navController.navigate("quiz_completion/${score}/${totalQuestions}") {
                                 popUpTo("home_screen") {
                                     inclusive = false
                                 }
