@@ -149,6 +149,7 @@ fun Questions(navController:NavController,
 
                 val answersList = question.incorrect_answers.toMutableList()
                 answersList.add(question.correct_answer)
+                //answersList.shuffle()
                 question.answers = answersList
                 Column {
                     question.answers.forEach { answer ->
@@ -220,7 +221,7 @@ fun Questions(navController:NavController,
                     onClick = {
                         if (currentQuestionIndex + 1 == viewModel.getTotalQuestionsCount()) {
                             val totalQuestions = viewModel.getTotalQuestionsCount()
-                            navController.navigate("quiz_completion/${score}/${totalQuestions}") {
+                            navController.navigate("quiz_completion/$categoryId/$difficulty/$score/$totalQuestions") {
                                 popUpTo("home_screen") {
                                     inclusive = false
                                 }
@@ -247,44 +248,4 @@ fun DrawSeparator(pathEffect : PathEffect){
         .height(1.dp)) {
         drawLine(color = AppColors.mBlack, start = Offset(0f,0f), end = Offset(size.width,0f), pathEffect = pathEffect)
     }
-}
-
-@Composable
-fun ConfettiAnimation(modifier: Modifier = Modifier, onAnimationEnd: () -> Unit = {}) {
-    var particles by remember { mutableStateOf(emptyList<ConfettiParticle>()) }
-
-    LaunchedEffect(Unit)
-    {
-        particles = List(100) {
-            ConfettiParticle(
-                x = Random.nextFloat() * 1200f,
-                y = Random.nextFloat() * -1200f,
-                velocityY = Random.nextFloat() * 28f + 28f,
-                color = Color(
-                    red = Random.nextFloat(),
-                    green = Random.nextFloat(),
-                    blue = Random.nextFloat(),
-                    alpha = 1f
-                ),
-                size = Random.nextFloat() * 12f + 4f
-            )
-        }
-        repeat(100) {
-            delay(16)
-            particles = particles.map { it.copy(y = it.y + it.velocityY) }
-        }
-        //onAnimationEnd()
-    }
-
-    Canvas(modifier = modifier.fillMaxSize())
-    {
-        particles.forEach {
-            drawCircle(
-                color = it.color,
-                radius = it.size,
-                center = Offset(it.x, it.y)
-            )
-        }
-    }
-
 }

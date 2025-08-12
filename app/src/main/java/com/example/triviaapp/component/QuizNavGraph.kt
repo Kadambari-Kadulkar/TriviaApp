@@ -38,15 +38,22 @@ fun QuizNavGraph(
         }
         //Result Screen
         composable(
-            route = "quiz_completion/{score}/{total}", arguments = listOf(
+            route = "quiz_completion/{categoryId}/{difficulty}/{score}/{total}", arguments = listOf(
+                navArgument("categoryId") { type = NavType.IntType },
+                navArgument("difficulty") { type = NavType.StringType },
                 navArgument("score") { type = NavType.IntType },
                 navArgument("total") { type = NavType.IntType })
         ) { navBackStackEntry ->
             val score = navBackStackEntry.arguments?.getInt("score") ?: 0
             val total = navBackStackEntry.arguments?.getInt("total") ?: 15
+            val categoryId = navBackStackEntry.arguments?.getInt("categoryId") ?: 15
+            val difficulty = navBackStackEntry.arguments?.getString("difficulty") ?: "easy"
+
 
             QuizCompletion(
                 navController,
+                categoryId = categoryId,
+                difficulty = difficulty,
                 score = score,
                 total = total
             )

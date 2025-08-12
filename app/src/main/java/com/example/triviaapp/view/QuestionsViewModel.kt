@@ -44,7 +44,7 @@ class QuestionsViewModel @Inject constructor(private val repo: QuestionRepositor
     private var currentDifficultyLevel: String = ""
 
 
-    fun getAllQuestions(amount: Int = 5 , categoryId: Int, difficulty: String) {
+    fun getAllQuestions(amount: Int = 15 , categoryId: Int, difficulty: String) {
         currentCategoryId = categoryId
         currentDifficultyLevel = difficulty
 
@@ -91,7 +91,8 @@ class QuestionsViewModel @Inject constructor(private val repo: QuestionRepositor
         return data.value.data?.results?.getOrNull(currentQuestionIndex)
     }
 
-    fun getTotalQuestionsCount():Int = totalQuestions
+
+    fun getTotalQuestionsCount(): Int = totalQuestions
 
 
 
