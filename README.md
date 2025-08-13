@@ -1,1 +1,1 @@
-| <img src="screenshots/home.png" width="250"/> | <img src="screenshots/question_1.png" width="250"/> | <img src="screenshots/question_2.png" width="250"/> | <img src="screenshots/result.png" width="250"/> |
+| <img src="screenshots/home.png" width="200"/> | <img src="screenshots/question_1.png" width="200"/> | <img src="screenshots/question_2.png" width="200"/> | <img src="screenshots/result.png" width="200"/> |
