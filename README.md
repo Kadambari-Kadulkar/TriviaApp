@@ -1,1 +1,1 @@
-| ![Home](screenshots/home.png) | ![Quiz](screenshots/question_1.png) | ![Quiz](screenshots/question_2.png) | ![Result](screenshots/result.png) |
+| <img src="screenshot/home.png" width="250"/> | <img src="screenshot/question_1.png" width="250"/> | <img src="screenshot/question_2.png" width="250"/> | <img src="screenshot/result.png" width="250"/> |
