@@ -147,10 +147,6 @@ fun Questions(navController:NavController,
                 DrawSeparator(pathEffect)
                 Spacer(modifier = Modifier.height(40.dp))
 
-                val answersList = question.incorrect_answers.toMutableList()
-                answersList.add(question.correct_answer)
-                //answersList.shuffle()
-                question.answers = answersList
                 Column {
                     question.answers.forEach { answer ->
                         val isCorrect = answer == question.correct_answer
@@ -209,7 +205,7 @@ fun Questions(navController:NavController,
                                     )
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = answer, color = textColor)
+                            Text(text = Util.decodeHTMLText(answer), color = textColor)
                         }
                     }
                 }

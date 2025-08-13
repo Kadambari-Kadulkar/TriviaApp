@@ -28,6 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,7 +59,17 @@ fun QuizCompletion(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Text("Quiz Completed", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            val resultText = when(score){
+                in 0..5 -> "Good attempt, Give another try."
+                in 6..10 -> "Not Bad, You did Well."
+                else -> { "Well Done, That's amazing!!" }
+            }
+
+            Text("Quiz Completed", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold)
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(resultText, fontSize = 28.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
 
             Spacer(modifier = Modifier.height(12.dp))
 

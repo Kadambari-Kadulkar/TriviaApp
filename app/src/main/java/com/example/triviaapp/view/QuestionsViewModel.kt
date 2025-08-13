@@ -50,15 +50,41 @@ class QuestionsViewModel @Inject constructor(private val repo: QuestionRepositor
 
         viewModelScope.launch(Dispatchers.IO){
             data.value.loading = true
-            data.value = repo.getAllQuestions(amount, categoryId, difficulty)
-            //Log.e("questions: ", data.value.data!!.results.size.toString())
-            if(data.value.data.toString().isNotEmpty()) data.value.loading = false
 
-            totalQuestions = data.value.data?.results?.size ?: 0
-            currentQuestionIndex = 0
-            score = 0
-            selectedAnswer = null
-            isAnswerSelected = false
+            try {
+            data.value = repo.getAllQuestions(amount, categoryId, difficulty)
+                val mappedQuestion = data.value.data?.results?.map { result ->
+                    val allAnswers = mutableListOf<String>().apply {
+                        add(result.correct_answer)
+                        addAll(result.incorrect_answers)//.map { string -> Util.decodeHTMLText(string) })
+                    }.shuffled()
+
+                    Result(
+                        category = result.category,
+                        correct_answer = result.correct_answer,
+                        incorrect_answers = result.incorrect_answers,
+                        difficulty = result.difficulty,
+                        question = result.question,
+                        type = result.type,
+                        answers = allAnswers
+                    )
+                }
+                data.value.loading = false
+                if (mappedQuestion != null) {
+                    data.value.data?.results = mappedQuestion
+                }
+
+
+                totalQuestions = data.value.data?.results?.size ?: 0
+                currentQuestionIndex = 0
+                score = 0
+                selectedAnswer = null
+                isAnswerSelected = false
+            }
+            catch (e: Exception){
+                data.value.loading = false
+                data.value.e = e
+            }
 
         }
     }
